@@ -5,29 +5,17 @@ using UnityEngine.UI;
 
 public class ChipView : MonoBehaviour
 {
-
-    // Start is called before the first frame update
-    //void Start()
-    //{
-    //    //RGBをランダムに設定
-    //    _image.color = new Color(Random.Range(0, 1.0f), Random.Range(0,1.0f), Random.Range(0, 1.0f));
-    //}
-
+    //  繝槭ャ繝励メ繝�繝励う繝｡繝ｼ繧ｸ
     [SerializeField]
     private Image _image = null;
 
 
     /// <summary>
-    /// マップスプライトを設置する
+    /// 繝槭ャ繝励せ繝励Λ繧､繝医ｒ險ｭ鄂ｮ縺吶ｋ
     /// </summary>
-    /// <param name="sprit"></param>
-
-    public void SetImage(Sprite sprit) 
+    /// <param name="sprite">陦ｨ遉ｺ縺吶ｋ繧､繝｡繝ｼ繧ｸ</param>
+    public void SetImage(Sprite sprite)
     {
-        _image.sprite = sprit;
-    }
-    void Update()
-    {
-        
+        _image.sprite = sprite;
     }
 }
