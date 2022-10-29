@@ -23,11 +23,34 @@ public class DungeonManager : MonoBehaviour
         //   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,0,0,0x0107,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1},
+            {1,0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,1,1,1,1,0,0,0,0,1,1,1,1},
+            {1,0,0,0,0,0,0,0,0x0104,1,1,1,1,0,0,0,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0x0109,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        },
+         {
+        //   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1},
             {1,0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -43,42 +66,52 @@ public class DungeonManager : MonoBehaviour
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         },
     };
-    private List<List<List<int>>> _mapData = new List<List<List<int>>>()
-    {
-        new List<List<int>>()
-        {
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            new List<int>(){1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        },
-    };
+
 
     [SerializeField, Header("プレイヤーをアタッチする")]
 
     private PlayerView _playerView = null;
+
+    private List<int> _mapHitTable = new List<int>() { 1, 4, 7, 8 };
 
     // Start is called before the first frame update
     void Start()
     {
         MapMake();
     }
+
+    /// <summary>
+    /// マップデータの取得
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    private int GetMapData(Vector3Int pos)
+    {
+        return _mapDataList[0, pos.y, pos.x] & 0xff;
+    }
+
+    private int GetMapStat(Vector3Int pos)
+    {
+        return _mapDataList[0, pos.y, pos.x] >> 8;
+    }
+
+    private bool IsWalkEnable(Vector3Int pos)
+    {
+        int mapData = GetMapData(pos);      // マップデータの取得
+        int mapStat = GetMapStat(pos);      // マップ情報の取得
+        // マップが壁であり、通り抜け可能なら true を返す
+        if (1 == mapStat && 1 == mapData)
+            return true;
+        // 当たり判定のチップデータを順番にマップデータと比較してヒットしたらr移動不可能なので false を返す
+        foreach (int mapHitChip in _mapHitTable)
+        {
+            if (mapHitChip == mapData)
+                return false;
+        }
+        // どのチップとも一致しなければ通り抜け可能なので true を返す
+        return true;
+    }
+
 
     private void MapMake()
     {
@@ -103,21 +136,25 @@ public class DungeonManager : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            _playerView.WalkAction(PlayerView.PlayerDirection.Right);
+            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right)))
+                _playerView.WalkAction(PlayerView.PlayerDirection.Right);
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            _playerView.WalkAction(PlayerView.PlayerDirection.Left);
+            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left)))
+                _playerView.WalkAction(PlayerView.PlayerDirection.Left);
         }
         else if (Input.GetKey(KeyCode.UpArrow))
         {
-            _playerView.WalkAction(PlayerView.PlayerDirection.Back);
+            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back)))
+                _playerView.WalkAction(PlayerView.PlayerDirection.Back);
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            _playerView.WalkAction(PlayerView.PlayerDirection.Front);
+            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front)))
+                _playerView.WalkAction(PlayerView.PlayerDirection.Front);
         }
-        else if(false == _playerView.IsWalking)
+        else if (false == _playerView.IsWalking)
         {
             _playerView.SetAnimationState(PlayerView.PlayerMode.Idle);
         }
