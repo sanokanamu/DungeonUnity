@@ -315,5 +315,17 @@ public class DungeonManager : MonoBehaviour
             }
         }
     }
+    private void TChech(Vector3Int pos, AroundDirection aroundDirextion)
+    {
+
+    }
+    /*
+    private void TreasureChek()
+    {
+        TChek
+    }*/
+
     #endregion
 }
+
+

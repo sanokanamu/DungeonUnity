@@ -20,7 +20,11 @@ public class PlayerView : MonoBehaviour
         RightWalk = 1,
         FrontWalk = 2,
         LeftWalk = 3,
-        BackWalk = 4
+        BackWalk = 4,
+        RIdle = 5,
+        FIdle = 6,
+        LIdle = 7,
+        BIdle = 8
     }
 
     //  プレイヤーの向き
@@ -30,7 +34,8 @@ public class PlayerView : MonoBehaviour
         Right = 1,
         Front = 2,
         Left = 3,
-        Back = 4
+        Back = 4,
+
     }
     //  プレイヤーの状態
     private PlayerMode _playerMode = PlayerMode.Idle;
@@ -67,7 +72,25 @@ public class PlayerView : MonoBehaviour
     //  プレイヤー初期座標
     public Vector3Int PlayerPos { get; private set; } = new Vector3Int(1, 1, 0);
 
-    private static readonly int PlayerAnimStat = Animator.StringToHash("PlayerAnimStat");
+    private static readonly int _frontAction = Animator.StringToHash("FrontAction");
+
+    private static readonly int _rightAction = Animator.StringToHash("RightAction");
+
+    private static readonly int _leftAction = Animator.StringToHash("LeftAction");
+
+    private static readonly int _backAction = Animator.StringToHash("BackAction");
+
+    private static readonly int _idleAction = Animator.StringToHash("IdleAction");
+
+    private static readonly int _frontIdle = Animator.StringToHash("FIdle");
+
+    private static readonly int _rightIdle = Animator.StringToHash("RIdle");
+
+    private static readonly int _leftIdle = Animator.StringToHash("LIdle");
+
+    private static readonly int _backIdle = Animator.StringToHash("BIdle");
+
+    //private static readonly int PlayerAnimStat = Animator.StringToHash("PlayerAnimStat");
     private static readonly Vector3 PlayerInitialPosition = new Vector3(-272f, 272f, 0f);
     private static readonly Vector3 MapLeftTopPosition = new Vector3(-304, 304, 0);
 
@@ -96,7 +119,22 @@ public class PlayerView : MonoBehaviour
     /// <param name="playerMode">アニメーションの状態</param>
     public void SetAnimationState(PlayerMode playerMode)
     {
-        _animator.SetInteger(PlayerAnimStat, (int)playerMode);
+        if (_playerMode == playerMode) return;
+        _playerMode = playerMode;
+        switch (playerMode)
+        {
+            case PlayerMode.FrontWalk: _animator.SetTrigger(_frontAction); break;
+            case PlayerMode.RightWalk: _animator.SetTrigger(_rightAction); break;
+            case PlayerMode.LeftWalk: _animator.SetTrigger(_leftAction); break;
+            case PlayerMode.BackWalk: _animator.SetTrigger(_backAction); break;
+            case PlayerMode.FIdle: _animator.SetTrigger(_frontIdle); break;
+            case PlayerMode.RIdle: _animator.SetTrigger(_rightIdle); break;
+            case PlayerMode.LIdle: _animator.SetTrigger(_leftIdle); break;
+            case PlayerMode.BIdle: _animator.SetTrigger(_backIdle); break;
+            default: _animator.SetTrigger(_idleAction); break;
+
+        }
+        //_animator.SetInteger(PlayerAnimStat, (int)playerMode);
     }
 
     /// <summary>
