@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class DungeonManager : MonoBehaviour
@@ -26,7 +27,7 @@ public class DungeonManager : MonoBehaviour
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,0x0107,0,0,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,1,1,0,0,0x1009,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,1,1,0,0,0x2009,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,2,0,0,0,0,0,0,0,0x0109,1,1,1,1,1,1,1},
@@ -35,7 +36,7 @@ public class DungeonManager : MonoBehaviour
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0x0104,1,1,1,1,1,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,0x0209,0,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,0x0209,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -71,10 +72,10 @@ public class DungeonManager : MonoBehaviour
     [SerializeField, Header("プレイヤーをアタッチする")]
     private PlayerView _playerView = null;
 
-    //　生成したマップオブジェクトを格納する場所
+    //  生成したマップオブジェクトを格納する場所
     private List<ChipView> _chipViews = new List<ChipView>();
 
-    //　現在の階数　(0:1階, 1:2階...)
+    //  現在の階数（0:１階, 1:２階...）
     private int _mapFloor = 0;
 
     //  当たり判定のマップキャラクター番号
@@ -83,6 +84,7 @@ public class DungeonManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //  移動終了のコールバックを登録
         _playerView.SetupWalkEndCallback(EventWalkEndCallback);
         MapMake();
     }
@@ -127,35 +129,39 @@ public class DungeonManager : MonoBehaviour
         //  どのチップとも一致しなければ通り抜け可能なので true を返す
         return true;
     }
-
+    
     private void MapMake()
     {
         //  y を０から１９まで変化させる
-        foreach (int y in Enumerable.Range(0, 20))
+        foreach (int y in Enumerable.Range(0,20))
         {
             //  x を０から１９まで変化させる
-            foreach (int x in Enumerable.Range(0, 20))
+            foreach (int x in Enumerable.Range(0,20))
             {
                 //  プレハブの実態をヒエラルキーに生成する
                 GameObject gobj = Instantiate(_mapParts, _parent);
                 //  表示座標を設定する
                 gobj.transform.localPosition = new Vector3(-304 + x * 32, 304 - y * 32, 0);
-                //   マップデータの取得
+                //  マップチップデータの取得
                 int mData = GetMapData(new Vector3Int(x, y, 0));
                 //  マップスプライトの設定
                 gobj.GetComponent<ChipView>().SetImage(_mapChipSprites[mData]);
-
+                //  マップチップオブジェクトの格納
                 _chipViews.Add(gobj.GetComponent<ChipView>());
             }
         }
     }
 
+    /// <summary>
+    /// マップの再描画
+    /// </summary>
     private void RedrawMap()
     {
-        foreach (int y in Enumerable.Range(0, 20))
+        //  y を０から１９まで変化させる
+        foreach (int y in Enumerable.Range(0,20))
         {
             //  x を０から１９まで変化させる
-            foreach (int x in Enumerable.Range(0, 20))
+            foreach (int x in Enumerable.Range(0,20))
             {
                 int index = y * 20 + x;
                 int mData = GetMapData(new Vector3Int(x, y, 0));
@@ -166,45 +172,47 @@ public class DungeonManager : MonoBehaviour
 
     private void Update()
     {
+        //  右の矢印を押した？
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right)))
+            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right)))
                 _playerView.WalkAction(PlayerView.PlayerDirection.Right);
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left)))
+            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left)))
                 _playerView.WalkAction(PlayerView.PlayerDirection.Left);
         }
         else if (Input.GetKey(KeyCode.UpArrow))
         {
-            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back)))
+            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back)))
                 _playerView.WalkAction(PlayerView.PlayerDirection.Back);
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            if (IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front)))
+            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front)))
                 _playerView.WalkAction(PlayerView.PlayerDirection.Front);
         }
         else if (false == _playerView.IsWalking)
         {
             _playerView.SetAnimationState(PlayerView.PlayerMode.Idle);
-
+            //  移動終了していてスペースキーを押した場合
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                //  マップのイベントをチェックする
                 MapEventCheck();
             }
         }
     }
 
-    #region イベントチェック
+#region イベントチェック
 
     private enum AroundDirection
     {
-        Left,
-        Right,
         Up,
-        Down
+        Left,
+        Down,
+        Right
     }
 
     /// <summary>
@@ -212,16 +220,27 @@ public class DungeonManager : MonoBehaviour
     /// </summary>
     private void EventWalkEndCallback()
     {
+        //  落とし穴チェック
         HoleCheck();
-
+        //  ワープチェック
         WarpCheck();
     }
-
+    
+    /// <summary>
+    /// 座標から index を取得する
+    /// </summary>
+    /// <param name="pos">対象の座標</param>
+    /// <returns>index</returns>
     private int GetObjectIndex(Vector3Int pos)
     {
         return pos.y * 20 + pos.x;
     }
 
+    /// <summary>
+    /// プレイヤー周囲座標検出
+    /// </summary>
+    /// <param name="aroundDirection">方向</param>
+    /// <returns>指定方向の座標</returns>
     private Vector3Int GetAroundPos(AroundDirection aroundDirection)
     {
         switch (aroundDirection)
@@ -237,21 +256,22 @@ public class DungeonManager : MonoBehaviour
         }
         return _playerView.PlayerPos;
     }
-
+    
+    
     /// <summary>
-    /// マップのイベントをチェックする
+    /// マップのイベントチェック
     /// </summary>
     private void MapEventCheck()
     {
-        if (UpFloorChek())
+        if(UpFloorCheck())
             DownFloorCheck();
     }
 
     /// <summary>
-    /// 上り階段チェック
+    /// 登り階段チェック
     /// </summary>
-    /// <returns></returns>
-    private bool UpFloorChek()
+    /// <returns>登れたら false を返す</returns>
+    private bool UpFloorCheck()
     {
         int mdata = GetMapData(_playerView.PlayerPos);
         if (2 == mdata)
@@ -289,23 +309,28 @@ public class DungeonManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ワープチェック
+    /// </summary>
     private void WarpCheck()
     {
-        // 最初のマップデータとステータスを取得する
+        //  最初のマップデータとステータスを取得する
         int mData = GetMapData(_playerView.PlayerPos);
         int mStat = GetMapStat(_playerView.PlayerPos) >> 4;
-        // ワープポイントかどうかのチェック
+        //  ワープポイントかどうかのチェック
         if (9 == mData)
         {
-            foreach (int y in Enumerable.Range(0, 20))
+            //  y を０から１９まで変化させる
+            foreach (int y in Enumerable.Range(0,20))
             {
                 //  x を０から１９まで変化させる
-                foreach (int x in Enumerable.Range(0, 20))
+                foreach (int x in Enumerable.Range(0,20))
                 {
+                    //  マップ座標を取得
                     Vector3Int pos = new Vector3Int(x, y, 0);
-                    int md = GetMapData(pos);
-                    int sd = GetMapStat(pos) & 0x0f;
-                    // マップがワープポイントで移動先のインデックスと移動予定のインデックスが一致すればそこがワープ先
+                    int        md  = GetMapData(pos);
+                    int        sd  = GetMapStat(pos) & 0x0f;
+                    //  マップがワープポイントで移動先のインデックスと移動予定のインデックスが一致すればそこがワープ先
                     if (9 == md && mStat == sd)
                     {
                         _playerView.SetPlayerPosition(pos);
@@ -315,17 +340,24 @@ public class DungeonManager : MonoBehaviour
             }
         }
     }
-    private void TChech(Vector3Int pos, AroundDirection aroundDirextion)
-    {
 
+    /// <summary>
+    /// 宝箱周囲のチェック
+    /// </summary>
+    /// <param name="aroundDirection"></param>
+    private void TCheck(Vector3Int pos, AroundDirection aroundDirection)
+    {
+        
     }
-    /*
-    private void TreasureChek()
+
+    private void TreasureCheck()
     {
-        TChek
-    }*/
-
-    #endregion
+        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
+        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
+        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
+        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
+    }
+    
+#endregion
+    
 }
-
-
