@@ -172,26 +172,28 @@ public class DungeonManager : MonoBehaviour
 
     private void Update()
     {
+        if(false == _playerView.IsWalking)
+
         //  右の矢印を押した？
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right)))
-                _playerView.WalkAction(PlayerView.PlayerDirection.Right);
+            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right));
+                _playerView.WalkAction(PlayerView.PlayerDirection.Right, isWalkEnable);
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left)))
-                _playerView.WalkAction(PlayerView.PlayerDirection.Left);
+            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left));
+            _playerView.WalkAction(PlayerView.PlayerDirection.Left, isWalkEnable); ;
         }
         else if (Input.GetKey(KeyCode.UpArrow))
         {
-            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back)))
-                _playerView.WalkAction(PlayerView.PlayerDirection.Back);
+            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back));
+            _playerView.WalkAction(PlayerView.PlayerDirection.Back, isWalkEnable);
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            if(IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front)))
-                _playerView.WalkAction(PlayerView.PlayerDirection.Front);
+            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front));
+            _playerView.WalkAction(PlayerView.PlayerDirection.Front, isWalkEnable);
         }
         else if (false == _playerView.IsWalking)
         {
