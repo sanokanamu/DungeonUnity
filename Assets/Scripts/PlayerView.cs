@@ -82,6 +82,9 @@ public class PlayerView : MonoBehaviour
     private Action _walkEndCallback = null;
     // 現在のプレイヤーの向き
     private PlayerDirection _playerDirection = PlayerDirection.None;
+    // 外部からのアクセスは　read only として書き換えられないようにする
+    public PlayerDirection PlayerDir => _playerDirection;
+    // public PlayerDirecton PlayerDir {get{return _playerDirection;}}
 
 #endregion
     
@@ -164,6 +167,7 @@ public class PlayerView : MonoBehaviour
     /// <returns>移動予定の場所</returns>
     public Vector3Int GetNextPosition(PlayerDirection playerDirection)
     {
+        _playerDirection = playerDirection;
         return (PlayerPos + _playerPosAddLists[playerDirection]);
     }
     

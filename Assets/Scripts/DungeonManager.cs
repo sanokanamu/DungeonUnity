@@ -35,7 +35,7 @@ public class DungeonManager : MonoBehaviour
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0x0104,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,0,0,0,0x0104,0,0,0,0,2,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,0x0209,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -58,9 +58,9 @@ public class DungeonManager : MonoBehaviour
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,0,0,0,1,1,1,1,1,3,0,0,0,1,1,1},
+            {1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,0,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -207,8 +207,9 @@ public class DungeonManager : MonoBehaviour
         }
     }
 
-#region イベントチェック
+    #region イベントチェック
 
+    private List<int> _doorKeys = new List<int>() { 0,0,0,0 };
     private enum AroundDirection
     {
         Up,
@@ -216,6 +217,17 @@ public class DungeonManager : MonoBehaviour
         Down,
         Right
     }
+
+    //辞書テーブルの用意(向きのenumとその方向のベクトルをセットにして登録)
+    private Dictionary<PlayerView.PlayerDirection, Vector3Int> _directionVecLists =
+        new Dictionary<PlayerView.PlayerDirection, Vector3Int>()
+        {
+            { PlayerView.PlayerDirection.None, Vector3Int.zero },
+            { PlayerView.PlayerDirection.Back, Vector3Int.down },
+            { PlayerView.PlayerDirection.Left, Vector3Int.left },
+            { PlayerView.PlayerDirection.Right, Vector3Int.right },
+            { PlayerView.PlayerDirection.Front, Vector3Int.up }
+        };
 
     /// <summary>
     /// 移動終了で呼び出されるコールバック関数
@@ -265,8 +277,13 @@ public class DungeonManager : MonoBehaviour
     /// </summary>
     private void MapEventCheck()
     {
+        // 階段上り下りチェック
         if(UpFloorCheck())
             DownFloorCheck();
+        // 宝箱チェック
+        TreasureCheck();
+        // ドアチェック
+        DoorCheck();
     }
 
     /// <summary>
@@ -354,10 +371,58 @@ public class DungeonManager : MonoBehaviour
 
     private void TreasureCheck()
     {
+        // 向いている方向の座標を取得 
+        var checkPos = _playerView.PlayerPos + _directionVecLists[_playerView.PlayerDir];
+        // マップチップデータを取得
+        var mData = GetMapData(checkPos);
+        // マップステータスを取得
+        var sData = GetMapStat(checkPos);
+        //  マップチップデータが閉じた宝箱ならば処理する
+        if(7 == mData)
+        {
+            // 宝箱の鍵の番号を調整(1～なので０～に直すために１マイナスする)
+            sData--;
+            // 持っている鍵が追加される
+            _doorKeys[sData]++;
+            // 閉じたあ宝箱を開いた宝箱に変更
+            _mapDataList[_mapFloor, checkPos.y, checkPos.x] = 8;
+            // マップチップの配置場所を取得
+            var index = checkPos.y * 20 + checkPos.x;
+            // 対象のスプライトを入れ替える
+            _chipViews[index].SetImage(_mapChipSprites[8]);
+        }
+        /*
         TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
         TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
         TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
         TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
+        */
+    }
+    private void DoorCheck()
+    {
+        // 向いている方向の座標を取得 
+        var checkPos = _playerView.PlayerPos + _directionVecLists[_playerView.PlayerDir];
+        // マップチップデータを取得
+        var mData = GetMapData(checkPos);
+        // マップステータスを取得
+        var sData = GetMapStat(checkPos);
+        //  マップチップデータが閉じた宝箱ならば処理する
+        if (4 == mData)
+        {
+            // 宝箱の鍵の番号を調整(1～なので０～に直すために１マイナスする)
+            sData--;
+            if (0 < _doorKeys[sData])
+            {
+                // 持っている鍵が消費される
+                _doorKeys[sData]--;
+                // 閉じたあ宝箱を開いた宝箱に変更
+                _mapDataList[_mapFloor, checkPos.y, checkPos.x] = 0;
+                // マップチップの配置場所を取得
+                var index = checkPos.y * 20 + checkPos.x;
+                // 対象のスプライトを入れ替える
+                _chipViews[index].SetImage(_mapChipSprites[0]);
+            }
+        }
     }
     
 #endregion
