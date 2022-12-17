@@ -80,11 +80,11 @@ public class PlayerView : MonoBehaviour
 
     //  移動終了時呼び出すコールバック関数
     private Action _walkEndCallback = null;
-    // 現在のプレイヤーの向き
+    //  現在のプレイヤーの向き
     private PlayerDirection _playerDirection = PlayerDirection.None;
-    // 外部からのアクセスは　read only として書き換えられないようにする
+    //  外部からのアクセスは read only として書き換えられないようにする
     public PlayerDirection PlayerDir => _playerDirection;
-    // public PlayerDirecton PlayerDir {get{return _playerDirection;}}
+    // public PlayerDirection PlayerDir {get{return _playerDirection;}}
 
 #endregion
     
@@ -167,6 +167,7 @@ public class PlayerView : MonoBehaviour
     /// <returns>移動予定の場所</returns>
     public Vector3Int GetNextPosition(PlayerDirection playerDirection)
     {
+        //  向いている方向を保存する
         _playerDirection = playerDirection;
         return (PlayerPos + _playerPosAddLists[playerDirection]);
     }
@@ -206,15 +207,18 @@ public class PlayerView : MonoBehaviour
             _walkEndCallback();
     }
 
+    /// <summary>
+    /// キーを入力した際のプレイヤーの向き設定
+    /// </summary>
+    /// <param name="playerDirection">プレイヤーの向き</param>
     public void PlayerDirectionSet(PlayerDirection playerDirection)
     {
-        switch(playerDirection)
+        switch (playerDirection)
         {
-            case PlayerDirection.Back: _animator.SetTrigger(_backIdle);break;
+            case PlayerDirection.Back: _animator.SetTrigger(_backIdle); break;
             case PlayerDirection.Front: _animator.SetTrigger(_frontIdle); break;
             case PlayerDirection.Left: _animator.SetTrigger(_leftIdle); break;
             case PlayerDirection.Right: _animator.SetTrigger(_rightIdle); break;
-
         }
     }
 }

@@ -11,32 +11,42 @@ public class DungeonManager : MonoBehaviour
     [SerializeField]
     private GameObject _mapParts = null;
 
+    //  重ね合わせ用の半透明壁オブジェクトプレハブ
+    [SerializeField]
+    private GameObject _overMapParts = null;
+
     //  親オブジェクト
     [SerializeField]
     private Transform _parent = null;
+
+    //  上に重ねるマップ配置用の親オブジェクト
+    [SerializeField]
+    private Transform _overMapParent = null;
 
     //  マップチップスプライト
     [SerializeField]
     private List<Sprite> _mapChipSprites = new List<Sprite>();
 
+    [SerializeField]
+    public MassageWindowManager _massageWindowManager = null;
     private int[,,] _mapDataList = new int[,,]
     {
         {
         //   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,1,1,1,0x0107,0,0,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1},
+            {1,0,1,1,0,0,0,0,0x0204,0,0,0x2009,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,1,1,0x0107,0,0,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,1,1,0,0,0x2009,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,1,1,2,0,0,0,0,0,0,0,0x0109,1,1,1,1,1,1,1},
+            {1,0,1,1,2,0,0,0,0x0304,0,0,0,0x0109,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,0x0101,0,0,0,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,0,1,0,0,0x0307,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0x0104,0,0,0,0,2,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,0x0209,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,0x2209,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -58,9 +68,9 @@ public class DungeonManager : MonoBehaviour
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,1,1,1,1,1,3,0,0,0,1,1,1},
-            {1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,0,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1},
+            {1,0,0,0,0,0,0,0,1,1,1,1,1,3,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1,0x0207,0,0,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -75,12 +85,16 @@ public class DungeonManager : MonoBehaviour
     //  生成したマップオブジェクトを格納する場所
     private List<ChipView> _chipViews = new List<ChipView>();
 
+    //  生成したオーバーマップオブジェクトを格納する場所
+    private List<GameObject> _chipOverViews = new List<GameObject>();
+
     //  現在の階数（0:１階, 1:２階...）
     private int _mapFloor = 0;
 
     //  当たり判定のマップキャラクター番号
     private List<int> _mapHitTable = new List<int>() { 1, 4, 7, 8 };
 
+    private bool _iswindowOpen = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -129,25 +143,37 @@ public class DungeonManager : MonoBehaviour
         //  どのチップとも一致しなければ通り抜け可能なので true を返す
         return true;
     }
-    
+
+    /// <summary>
+    /// マップの初期生成
+    /// </summary>
     private void MapMake()
     {
         //  y を０から１９まで変化させる
-        foreach (int y in Enumerable.Range(0,20))
+        foreach (int y in Enumerable.Range(0, 20))
         {
             //  x を０から１９まで変化させる
-            foreach (int x in Enumerable.Range(0,20))
+            foreach (int x in Enumerable.Range(0, 20))
             {
                 //  プレハブの実態をヒエラルキーに生成する
                 GameObject gobj = Instantiate(_mapParts, _parent);
+                //  重ね合わせオブジェクトをヒエラルキーに生成する
+                GameObject gOverobj = Instantiate(_overMapParts, _overMapParent);
                 //  表示座標を設定する
                 gobj.transform.localPosition = new Vector3(-304 + x * 32, 304 - y * 32, 0);
+                gOverobj.transform.localPosition = new Vector3(-304 + x * 32, 304 - y * 32, 0);
                 //  マップチップデータの取得
                 int mData = GetMapData(new Vector3Int(x, y, 0));
+                //  マップチップステータスの取得
+                int mStat = GetMapStat(new Vector3Int(x, y, 0));
                 //  マップスプライトの設定
                 gobj.GetComponent<ChipView>().SetImage(_mapChipSprites[mData]);
                 //  マップチップオブジェクトの格納
                 _chipViews.Add(gobj.GetComponent<ChipView>());
+                //  重ね合わせのオブジェクト表示を操作
+                gOverobj.SetActive(1 == mData && 1 == mStat);
+                //  オーバーマップチップオブジェクトの格納
+                _chipOverViews.Add(gOverobj);
             }
         }
     }
@@ -158,58 +184,75 @@ public class DungeonManager : MonoBehaviour
     private void RedrawMap()
     {
         //  y を０から１９まで変化させる
-        foreach (int y in Enumerable.Range(0,20))
+        foreach (int y in Enumerable.Range(0, 20))
         {
             //  x を０から１９まで変化させる
-            foreach (int x in Enumerable.Range(0,20))
+            foreach (int x in Enumerable.Range(0, 20))
             {
                 int index = y * 20 + x;
                 int mData = GetMapData(new Vector3Int(x, y, 0));
+                int mStat = GetMapStat(new Vector3Int(x, y, 0));
                 _chipViews[index].SetImage(_mapChipSprites[mData]);
+                _chipOverViews[index].SetActive(1 == mData && 1 == mStat);
             }
         }
     }
 
     private void Update()
     {
-        if(false == _playerView.IsWalking)
-
-        //  右の矢印を押した？
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (_iswindowOpen)
         {
-            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right));
-                _playerView.WalkAction(PlayerView.PlayerDirection.Right, isWalkEnable);
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left));
-            _playerView.WalkAction(PlayerView.PlayerDirection.Left, isWalkEnable); ;
-        }
-        else if (Input.GetKey(KeyCode.UpArrow))
-        {
-            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back));
-            _playerView.WalkAction(PlayerView.PlayerDirection.Back, isWalkEnable);
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front));
-            _playerView.WalkAction(PlayerView.PlayerDirection.Front, isWalkEnable);
-        }
-        else if (false == _playerView.IsWalking)
-        {
-            _playerView.SetAnimationState(PlayerView.PlayerMode.Idle);
-            //  移動終了していてスペースキーを押した場合
-            if (Input.GetKeyDown(KeyCode.Space))
+            //if (Input.GetKey(KeyCode.Z))  
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
+                Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
             {
-                //  マップのイベントをチェックする
-                MapEventCheck();
+                _iswindowOpen = false;
+                CloseMessege();
+            }
+            else
+                return;
+        }
+        if (false == _playerView.IsWalking)
+        {
+            //  右の矢印を押した？
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Right));
+                _playerView.WalkAction(PlayerView.PlayerDirection.Right, isWalkEnable);
+            }
+            else if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Left));
+                _playerView.WalkAction(PlayerView.PlayerDirection.Left, isWalkEnable);
+            }
+            else if (Input.GetKey(KeyCode.UpArrow))
+            {
+                bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Back));
+                _playerView.WalkAction(PlayerView.PlayerDirection.Back, isWalkEnable);
+            }
+            else if (Input.GetKey(KeyCode.DownArrow))
+            {
+                bool isWalkEnable = IsWalkEnable(_playerView.GetNextPosition(PlayerView.PlayerDirection.Front));
+                _playerView.WalkAction(PlayerView.PlayerDirection.Front, isWalkEnable);
+            }
+            else if (false == _playerView.IsWalking)
+            {
+                _playerView.SetAnimationState(PlayerView.PlayerMode.Idle);
+                //  移動終了していてスペースキーを押した場合
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    //  マップのイベントをチェックする
+                    MapEventCheck();
+                }
             }
         }
     }
 
     #region イベントチェック
 
-    private List<int> _doorKeys = new List<int>() { 0,0,0,0 };
+    //  鍵の保存場所
+    private List<int> _doorKeys = new List<int>() { 0, 0, 0, 0 };
+
     private enum AroundDirection
     {
         Up,
@@ -218,15 +261,15 @@ public class DungeonManager : MonoBehaviour
         Right
     }
 
-    //辞書テーブルの用意(向きのenumとその方向のベクトルをセットにして登録)
+    //  辞書テーブルの用意（向きのenumとその方向のベクトルをセットにして登録）
     private Dictionary<PlayerView.PlayerDirection, Vector3Int> _directionVecLists =
         new Dictionary<PlayerView.PlayerDirection, Vector3Int>()
         {
-            { PlayerView.PlayerDirection.None, Vector3Int.zero },
-            { PlayerView.PlayerDirection.Back, Vector3Int.down },
-            { PlayerView.PlayerDirection.Left, Vector3Int.left },
-            { PlayerView.PlayerDirection.Right, Vector3Int.right },
-            { PlayerView.PlayerDirection.Front, Vector3Int.up }
+            {PlayerView.PlayerDirection.None, Vector3Int.zero},
+            {PlayerView.PlayerDirection.Back, Vector3Int.down},
+            {PlayerView.PlayerDirection.Left, Vector3Int.left},
+            {PlayerView.PlayerDirection.Right, Vector3Int.right},
+            {PlayerView.PlayerDirection.Front, Vector3Int.up}
         };
 
     /// <summary>
@@ -239,7 +282,7 @@ public class DungeonManager : MonoBehaviour
         //  ワープチェック
         WarpCheck();
     }
-    
+
     /// <summary>
     /// 座標から index を取得する
     /// </summary>
@@ -270,19 +313,19 @@ public class DungeonManager : MonoBehaviour
         }
         return _playerView.PlayerPos;
     }
-    
-    
+
+
     /// <summary>
     /// マップのイベントチェック
     /// </summary>
     private void MapEventCheck()
     {
-        // 階段上り下りチェック
-        if(UpFloorCheck())
+        //  階段上り下りのチェック
+        if (UpFloorCheck())
             DownFloorCheck();
-        // 宝箱チェック
+        //  宝箱のチェック
         TreasureCheck();
-        // ドアチェック
+        //  ドアチェック
         DoorCheck();
     }
 
@@ -297,6 +340,7 @@ public class DungeonManager : MonoBehaviour
         {
             _mapFloor++;
             RedrawMap();
+            DispMessege(MassageWindowManager.MessageType.UpMessage, _mapFloor + 1);
             return false;
         }
         return true;
@@ -312,6 +356,7 @@ public class DungeonManager : MonoBehaviour
         {
             _mapFloor--;
             RedrawMap();
+            DispMessege(MassageWindowManager.MessageType.DownMessage, _mapFloor + 1);
         }
     }
 
@@ -325,6 +370,7 @@ public class DungeonManager : MonoBehaviour
         {
             _mapFloor--;
             RedrawMap();
+            DispMessege(MassageWindowManager.MessageType.HoleMessage, _mapFloor + 1);
         }
     }
 
@@ -340,15 +386,15 @@ public class DungeonManager : MonoBehaviour
         if (9 == mData)
         {
             //  y を０から１９まで変化させる
-            foreach (int y in Enumerable.Range(0,20))
+            foreach (int y in Enumerable.Range(0, 20))
             {
                 //  x を０から１９まで変化させる
-                foreach (int x in Enumerable.Range(0,20))
+                foreach (int x in Enumerable.Range(0, 20))
                 {
                     //  マップ座標を取得
                     Vector3Int pos = new Vector3Int(x, y, 0);
-                    int        md  = GetMapData(pos);
-                    int        sd  = GetMapStat(pos) & 0x0f;
+                    int md = GetMapData(pos);
+                    int sd = GetMapStat(pos) & 0x0f;
                     //  マップがワープポイントで移動先のインデックスと移動予定のインデックスが一致すればそこがワープ先
                     if (9 == md && mStat == sd)
                     {
@@ -360,71 +406,66 @@ public class DungeonManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 宝箱周囲のチェック
-    /// </summary>
-    /// <param name="aroundDirection"></param>
-    private void TCheck(Vector3Int pos, AroundDirection aroundDirection)
-    {
-        
-    }
-
     private void TreasureCheck()
     {
-        // 向いている方向の座標を取得 
+        //  向いている方向の座標を取得
         var checkPos = _playerView.PlayerPos + _directionVecLists[_playerView.PlayerDir];
-        // マップチップデータを取得
+        //  マップチップデータを取得
         var mData = GetMapData(checkPos);
-        // マップステータスを取得
+        //  マップステータスを取得
         var sData = GetMapStat(checkPos);
         //  マップチップデータが閉じた宝箱ならば処理する
-        if(7 == mData)
+        if (7 == mData)
         {
-            // 宝箱の鍵の番号を調整(1～なので０～に直すために１マイナスする)
+            //  宝箱の鍵の番号を調整（１〜なので０〜に直すために１マイナスする）
             sData--;
-            // 持っている鍵が追加される
+            //  持っている鍵が追加される
             _doorKeys[sData]++;
-            // 閉じたあ宝箱を開いた宝箱に変更
+            //  閉じた宝箱を開いた宝箱に変更
             _mapDataList[_mapFloor, checkPos.y, checkPos.x] = 8;
-            // マップチップの配置場所を取得
+            //  マップチップの配置場所を取得
             var index = checkPos.y * 20 + checkPos.x;
-            // 対象のスプライトを入れ替える
+            //  対象のスプライトを入れ替える
             _chipViews[index].SetImage(_mapChipSprites[8]);
         }
-        /*
-        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
-        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
-        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
-        TCheck(_playerView.PlayerPos + Vector3Int.up, AroundDirection.Up);
-        */
     }
+
     private void DoorCheck()
     {
-        // 向いている方向の座標を取得 
+        //  向いている方向の座標を取得
         var checkPos = _playerView.PlayerPos + _directionVecLists[_playerView.PlayerDir];
-        // マップチップデータを取得
+        //  マップチップデータを取得
         var mData = GetMapData(checkPos);
-        // マップステータスを取得
+        //  マップステータスを取得
         var sData = GetMapStat(checkPos);
-        //  マップチップデータが閉じた宝箱ならば処理する
+        //  マップチップデータが扉ならば処理する
         if (4 == mData)
         {
-            // 宝箱の鍵の番号を調整(1～なので０～に直すために１マイナスする)
+            //  宝箱の鍵の番号を調整（１〜なので０〜に直すために１マイナスする）
             sData--;
             if (0 < _doorKeys[sData])
             {
-                // 持っている鍵が消費される
+                //  持っている鍵が消費される
                 _doorKeys[sData]--;
-                // 閉じたあ宝箱を開いた宝箱に変更
+                //  扉を地面に変更
                 _mapDataList[_mapFloor, checkPos.y, checkPos.x] = 0;
-                // マップチップの配置場所を取得
+                //  マップチップの配置場所を取得
                 var index = checkPos.y * 20 + checkPos.x;
-                // 対象のスプライトを入れ替える
+                //  対象のスプライトを入れ替える
                 _chipViews[index].SetImage(_mapChipSprites[0]);
             }
         }
     }
-    
-#endregion
-    
+
+    #endregion
+
+    private void DispMessege(MassageWindowManager.MessageType messageType, int number)
+    {
+        _iswindowOpen = true;
+        _massageWindowManager.DispMessage(messageType, number);
+    }
+    private void CloseMessege()
+    {
+        _massageWindowManager.CloseMessege();
+    }
 }
