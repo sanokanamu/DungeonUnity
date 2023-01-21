@@ -203,13 +203,11 @@ public class DungeonManager : MonoBehaviour
         if (_iswindowOpen)
         {
             //if (Input.GetKey(KeyCode.Z))  
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-                Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-            {
+            if (Input.anyKey)
+            { 
                 _iswindowOpen = false;
                 CloseMessege();
             }
-            else
                 return;
         }
         if (false == _playerView.IsWalking)
